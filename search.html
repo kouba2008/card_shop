@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>بحث عن منتج</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .search-box {
+      display: flex;
+      margin: 20px auto;
+      max-width: 400px;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #009688;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .results {
+      margin-top: 30px;
+    }
+
+    .product {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-name {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .product-price {
+      color: #009688;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #e91e63;
+      margin-top: 20px;
+    }
+
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .nav-item {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .nav-item i {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .circle-button {
+      background: #009688;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: -25px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ابحث عن منتج</h1>
+
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="أدخل اسم المنتج...">
+    <button onclick="searchProduct()">بحث</button>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+    <a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><span>العروض</span></a>
+    <a href="search.html" class="nav-item search-btn"><div class="circle-button"><i class="fas fa-search"></i></div></a>
+    <a href="#" class="nav-item"><i class="fas fa-box"></i><span>الحالة</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>بروفايل</span></a>
+  </nav>
+
+  <script>
+    function searchProduct() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      const found = products.filter(p => p.name.toLowerCase().includes(query));
+
+      if (found.length === 0) {
+        results.innerHTML = '<div class="no-results">لم يتم العثور على المنتج.</div>';
+        return;
+      }
+
+      found.forEach(product => {
+        results.innerHTML += `
+          <div class="product">
+            <img src="${product.image}" alt="${product.name}">
+            <div class="product-name">${product.name}</div>
+            <div class="product-price">$${product.price}</div>
+          </div>
+        `;
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>الدفع</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      padding: 20px;
+    }
+    h2, h3 {
+      text-align: center;
+      color: #ffa500;
+    }
+    .section {
+      background: #2a2a2a;
+      padding: 15px;
+      margin: 20px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      max-width: 600px;
+    }
+    .product-review {
+      text-align: center;
+    }
+    .product-review img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .product-review h4 {
+      margin: 10px 0 5px;
+      color: #fff;
+    }
+    .address-box {
+      background: #444;
+      padding: 10px;
+      word-break: break-word;
+      margin-top: 5px;
+      border-radius: 6px;
+      color: #ffa500;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #ffa500;
+    }
+    input[type="file"], input[type="email"] {
+      margin: 10px 0;
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: #333;
+      color: #fff;
+    }
+    button {
+      background: #ffa500;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #paypal-button-container {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>مراجعة الطلب والدفع</h2>  <div class="section product-review" id="product-review"></div>  <div class="section">
+    <label for="email">البريد الإلكتروني:</label>
+    <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني">
+  </div>  <div class="section">
+    <h3>PayPal</h3>
+    <p>ادفع إلى: <strong class="address-box">farsadouyy@gmail.com</strong></p>
+    <div id="paypal-button-container"></div>
+  </div>  <div class="section">
+    <h3>USDT</h3>
+    <label>شبكة BEP20</label>
+    <div class="address-box">0xfde8b1a5baa0dae284597dc992691ec138d66451</div>
+    <label>شبكة TRC20</label>
+    <div class="address-box">TNiiH28EgydgtjiKKiY8is4EpebZXRhH5J</div>
+    <label>إثبات الدفع:</label>
+    <input type="file" id="proof">
+    <button onclick="confirmCryptoPayment()">تأكيد الدفع</button>
+  </div>  <div class="section">
+    <h3>Binance Pay</h3>
+    <p>ID: <strong class="address-box">951485501</strong></p>
+    <label>إثبات الدفع:</label>
+    <input type="file" id="binance-proof">
+    <button onclick="confirmBinancePay()">تأكيد Binance</button>
+  </div>  <div class="section">
+    <h3>RedotPay</h3>
+    <p>ID: <strong class="address-box">1704130144</strong></p>
+    <p>شبكة BEP20: <strong class="address-box">0x3F69065E6C2Eb72bAd39692543D5524CD084543c</strong></p>
+    <label>إثبات الدفع:</label>
+    <input type="file" id="redotpay-proof">
+    <button onclick="confirmRedotPay()">تأكيد RedotPay</button>
+  </div>  <div class="section">
+    <h3>رفض الدفع</h3>
+    <button onclick="rejectPayment()">رفض الدفع</button>
+  </div>  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>  <script>
+    const selectedProduct = JSON.parse(localStorage.getItem("selectedProduct"));
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const review = document.getElementById("product-review");
+    const emailInput = document.getElementById("email");
+
+    let productsToDisplay = [];
+    let totalPrice = 0;
+
+    if (selectedProduct) {
+      productsToDisplay = [selectedProduct];
+      totalPrice = parseFloat(selectedProduct.price);
+    } else if (cart.length > 0) {
+      productsToDisplay = cart;
+      totalPrice = cart.reduce((sum, product) => sum + parseFloat(product.price), 0);
+    } else {
+      review.innerHTML = "<p>لا توجد منتجات للدفع.</p>";
+    }
+
+    if (productsToDisplay.length > 0) {
+      review.innerHTML = productsToDisplay.map(p => `
+        ${p.image ? `<img src="${p.image}" alt="صورة المنتج">` : ""}
+        <h4>${p.name}</h4>
+        <p>${p.description}</p>
+        <p>السعر: ${p.price} $</p>
+        <hr style="border: 1px solid #555;">
+      `).join("") + `<h3>المجموع الكلي: ${totalPrice.toFixed(2)} $</h3>`;
+    }
+
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{ amount: { value: totalPrice.toFixed(2) } }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          const email = emailInput.value;
+          const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+          const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+          const now = new Date().getTime();
+
+          productsToDisplay.forEach(p => {
+            orders.push({ product: p.name, email, date: now });
+          });
+
+          notifications.push({ message: `تم استلام طلب من ${email} عبر PayPal`, date: now });
+
+          localStorage.setItem("orders", JSON.stringify(orders));
+          localStorage.setItem("notifications", JSON.stringify(notifications));
+          localStorage.setItem("orderStatus", "قيد المعالجة");
+          localStorage.setItem("paymentMethod", "PayPal");
+          localStorage.removeItem("selectedProduct");
+          localStorage.removeItem("cart");
+          alert("تم الدفع بواسطة PayPal. شكراً لك، " + details.payer.name.given_name);
+          window.location.href = "status.html";
+        });
+      }
+    }).render('#paypal-button-container');
+
+    function confirmPaymentCommon(method) {
+      const email = emailInput.value;
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      const now = new Date().getTime();
+
+      if (!email) {
+        alert("يرجى إدخال بريد إلكتروني.");
+        return;
+      }
+
+      const proofInput = {
+        USDT: "proof",
+        Binance: "binance-proof",
+        RedotPay: "redotpay-proof"
+      }[method];
+
+      const proof = document.getElementById(proofInput).files[0];
+      if (!proof) {
+        alert("يرجى رفع إثبات الدفع.");
+        return;
+      }
+
+      productsToDisplay.forEach(p => {
+        orders.push({ product: p.name, email, date: now });
+      });
+
+      notifications.push({ message: `تم استلام طلب من ${email} عبر ${method}`, date: now });
+
+      localStorage.setItem("orders", JSON.stringify(orders));
+      localStorage.setItem("notifications", JSON.stringify(notifications));
+      localStorage.setItem("orderStatus", `بانتظار التأكيد (${method})`);
+      localStorage.removeItem("selectedProduct");
+      localStorage.removeItem("cart");
+      window.location.href = "status.html";
+    }
+
+    function confirmCryptoPayment() {
+      confirmPaymentCommon("USDT");
+    }
+
+    function confirmBinancePay() {
+      confirmPaymentCommon("Binance");
+    }
+
+    function confirmRedotPay() {
+      confirmPaymentCommon("RedotPay");
+    }
+
+    function rejectPayment() {
+      const email = emailInput.value;
+      if (!email) {
+        alert("يرجى إدخال بريد إلكتروني.");
+        return;
+      }
+
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      const now = new Date().getTime();
+
+      productsToDisplay.forEach(p => {
+        orders.push({
+          product: p.name,
+          amount: p.price,
+          status: "rejected",
+          date: now,
+          email: email
+        });
+      });
+
+      notifications.push({ message: `تم رفض طلب من ${email}`, date: now });
+
+      localStorage.setItem("orders", JSON.stringify(orders));
+      localStorage.setItem("notifications", JSON.stringify(notifications));
+      alert("تم رفض الدفع. تم تسجيل الإشعار.");
+    }
+  </script></body>
+</html>

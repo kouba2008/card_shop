@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>سلة المشتريات</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f0f0f0;
+      direction: rtl;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #009688;
+    }
+
+    .product {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .product img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .product h3 {
+      margin: 0;
+    }
+
+    .product p {
+      margin: 5px 0;
+    }
+
+    .delete-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: red;
+      cursor: pointer;
+    }
+
+    .total {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    .pay-button {
+      display: block;
+      margin: 20px auto;
+      background-color: #009688;
+      color: white;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>سلة المشتريات</h2>
+  <div id="cart-container"></div>
+  <div class="total" id="total"></div>
+  <button class="pay-button" onclick="goToPayment()">الذهاب إلى الدفع</button>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const container = document.getElementById("cart-container");
+    const totalEl = document.getElementById("total");
+
+    function updateCartDisplay() {
+      container.innerHTML = "";
+      let total = 0;
+
+      if (cart.length === 0) {
+        container.innerHTML = "<p style='text-align:center;'>السلة فارغة.</p>";
+        totalEl.textContent = "";
+        return;
+      }
+
+      cart.forEach((product, index) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <button class="delete-button" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+          ${product.image ? `<img src="${product.image}" alt="صورة المنتج">` : ""}
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <p>السعر: ${product.price} $</p>
+        `;
+        container.appendChild(div);
+        total += parseFloat(product.price);
+      });
+
+      totalEl.textContent = "المجموع الكلي: " + total.toFixed(2) + " $";
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartDisplay();
+    }
+
+    function goToPayment() {
+      localStorage.removeItem("selectedProduct"); // تأكيد أن الدفع سيكون من السلة
+      window.location.href = "payment.html";
+    }
+
+    updateCartDisplay();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>حالة الطلب</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+      direction: rtl;
+      margin-bottom: 80px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .status-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .status-card h3 {
+      margin-bottom: 10px;
+      color: #009688;
+    }
+
+    .product {
+      text-align: center;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    .product img {
+      width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-name {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .product-price {
+      color: #009688;
+      margin-top: 5px;
+    }
+
+    .no-order {
+      text-align: center;
+      color: #999;
+      font-size: 15px;
+    }
+
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .nav-item {
+      text-align: center;
+      color: #666;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .nav-item i {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .circle-button {
+      background: #009688;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: -25px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>حالة الطلب</h1>
+
+  <div class="status-card">
+    <h3>الحالة الحالية:</h3>
+    <p id="order-status">جاري التوصيل...</p>
+  </div>
+
+  <div id="product-info"></div>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+    <a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><span>العروض</span></a>
+    <a href="search.html" class="nav-item search-btn"><div class="circle-button"><i class="fas fa-search"></i></div></a>
+    <a href="orders.html" class="nav-item"><i class="fas fa-box"></i><span>الحالة</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>بروفايل</span></a>
+  </nav>
+
+  <script>
+    // عرض الحالة من localStorage
+    const status = localStorage.getItem("orderStatus") || "جاري التوصيل...";
+    document.getElementById("order-status").innerText = status;
+
+    // عرض المنتج إذا تم الشراء
+    const orderProduct = JSON.parse(localStorage.getItem("orderProduct"));
+    const container = document.getElementById("product-info");
+
+    if (orderProduct) {
+      container.innerHTML = `
+        <div class="product">
+          <img src="${orderProduct.image}" alt="${orderProduct.name}">
+          <div class="product-name">${orderProduct.name}</div>
+          <div class="product-price">$${orderProduct.price}</div>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `<p class="no-order">لم تقم بأي طلب بعد.</p>`;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>متابعة الطلبات والإشعارات</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff9800;
+    }
+
+    input, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2c2c2c;
+      color: #fff;
+    }
+
+    button {
+      background-color: #ff9800;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .order-item, .notification {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      border-right: 4px solid #ff9800;
+    }
+
+    .section-title {
+      margin-top: 30px;
+      color: #ffa726;
+      border-bottom: 1px solid #555;
+      padding-bottom: 5px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>متابعة الطلبات</h2>
+    <input type="email" id="user-email" placeholder="أدخل بريدك الإلكتروني">
+    <button onclick="checkStatus()">عرض الطلبات والإشعارات</button>
+
+    <div id="orders-section"></div>
+
+    <div id="notifications-section">
+      <h3 class="section-title">الإشعارات:</h3>
+      <div id="notifications-list"></div>
+      <button id="clear-notifications-btn" class="hidden" onclick="clearNotifications()">مسح الإشعارات</button>
+    </div>
+  </div>
+
+  <script>
+    function checkStatus() {
+      const email = document.getElementById("user-email").value.trim();
+      if (!email) {
+        alert("يرجى إدخال البريد الإلكتروني.");
+        return;
+      }
+
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+
+      const ordersSection = document.getElementById("orders-section");
+      const notiList = document.getElementById("notifications-list");
+      const clearBtn = document.getElementById("clear-notifications-btn");
+
+      // عرض الطلبات
+      const userOrders = orders.filter(o => o.email === email);
+      ordersSection.innerHTML = "<h3 class='section-title'>الطلبات:</h3>";
+
+      if (userOrders.length === 0) {
+        ordersSection.innerHTML += "<p>لا توجد طلبات مسجلة لهذا البريد.</p>";
+      } else {
+        userOrders.forEach(order => {
+          ordersSection.innerHTML += `
+            <div class="order-item">
+              <strong>المنتج:</strong> ${order.product}<br>
+              <strong>الحالة:</strong> ${order.status || "قيد المراجعة"}
+            </div>
+          `;
+        });
+      }
+
+      // عرض الإشعارات
+      const userNotifications = notifications.filter(n => n.email === email);
+      notiList.innerHTML = "";
+
+      if (userNotifications.length === 0) {
+        notiList.innerHTML = "<p>لا توجد إشعارات حالياً.</p>";
+        clearBtn.classList.add("hidden");
+      } else {
+        userNotifications.forEach(note => {
+          notiList.innerHTML += `
+            <div class="notification">${note.message}</div>
+          `;
+        });
+        clearBtn.classList.remove("hidden");
+      }
+
+      clearBtn.setAttribute("data-email", email);
+    }
+
+    function clearNotifications() {
+      const email = document.getElementById("clear-notifications-btn").getAttribute("data-email");
+      let notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      notifications = notifications.filter(n => n.email !== email);
+      localStorage.setItem("notifications", JSON.stringify(notifications));
+      checkStatus(); // إعادة التحميل لتحديث العرض
+    }
+  </script>
+</body>
+</html>

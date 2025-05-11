@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>الإشعارات</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff9800;
+      position: relative;
+    }
+
+    #count {
+      font-size: 18px;
+      background: #ff9800;
+      color: #000;
+      border-radius: 50px;
+      padding: 3px 12px;
+      position: absolute;
+      top: 0;
+      left: 10px;
+    }
+
+    .notification {
+      background: #2a2a2a;
+      margin: 15px 0;
+      padding: 15px;
+      border-radius: 10px;
+      border-right: 5px solid #ff9800;
+    }
+
+    .notification strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .timestamp {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    .no-notifications {
+      text-align: center;
+      color: #bbb;
+      margin-top: 30px;
+    }
+
+    .clear-btn {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #ff5722;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .clear-btn:hover {
+      background-color: #e64a19;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>الإشعارات <span id="count"></span></h2>
+    <div id="notifications-box"></div>
+    <button class="clear-btn" onclick="clearNotifications()">مسح كل الإشعارات</button>
+  </div>
+
+  <script>
+    function loadNotifications() {
+      const box = document.getElementById("notifications-box");
+      const countSpan = document.getElementById("count");
+      box.innerHTML = "";
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+
+      if (notifications.length === 0) {
+        countSpan.textContent = "0";
+        box.innerHTML = "<p class='no-notifications'>لا توجد إشعارات حالياً.</p>";
+        return;
+      }
+
+      countSpan.textContent = notifications.length;
+
+      notifications.forEach((note) => {
+        const item = document.createElement("div");
+        item.className = "notification";
+        item.innerHTML = `
+          <strong>الإيميل: ${note.email}</strong>
+          ${note.message}
+          <div class="timestamp">${note.date || "تاريخ غير متوفر"}</div>
+        `;
+        box.appendChild(item);
+      });
+    }
+
+    function clearNotifications() {
+      if (confirm("هل أنت متأكد من أنك تريد مسح كل الإشعارات؟")) {
+        localStorage.removeItem("notifications");
+        loadNotifications();
+      }
+    }
+
+    window.onload = loadNotifications;
+  </script>
+</body>
+</html>
