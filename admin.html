@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة تحكم الأدمن</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    .hidden { display: none; }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.2);
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: #ff9800;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2c2c2c;
+      color: #fff;
+    }
+
+    button {
+      background-color: #ff9800;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .product-item, .order-item {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      border-right: 4px solid #ff9800;
+    }
+
+    .order-item img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
+      input, textarea, select, button {
+        font-size: 14px;
+      }
+
+      h2, h3 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="login-box">
+  <h2>تسجيل دخول الأدمن</h2>
+  <input type="email" id="admin-email" placeholder="البريد الإلكتروني">
+  <input type="password" id="admin-password" placeholder="كلمة المرور">
+  <button onclick="checkAdminLogin()">دخول</button>
+</div>
+
+<div class="container hidden" id="admin-box">
+  <h2>لوحة تحكم الأدمن</h2>
+
+  <input type="text" id="product-name" placeholder="اسم المنتج">
+  <input type="number" id="product-price" placeholder="السعر ($)">
+  <textarea id="product-desc" placeholder="وصف المنتج"></textarea>
+  <select id="product-location">
+    <option value="main">الصفحة الرئيسية</option>
+    <option value="offers">العروض</option>
+  </select>
+  <input type="file" id="product-image" accept="image/*">
+  <button onclick="addProduct()">إضافة المنتج</button>
+
+  <h3>المنتجات الحالية</h3>
+  <div id="product-list"></div>
+
+  <h3>طلبات الشراء</h3>
+  <div id="order-list"></div>
+</div>
+
+<script>
+  function checkAdminLogin() {
+    const email = document.getElementById("admin-email").value;
+    const password = document.getElementById("admin-password").value;
+
+    if (email === "admin12@" && password === "kouba12@") {
+      document.getElementById("login-box").classList.add("hidden");
+      document.getElementById("admin-box").classList.remove("hidden");
+      loadProducts();
+      loadOrders();
+    } else {
+      alert("اسم المستخدم أو كلمة المرور غير صحيحة");
+    }
+  }
+
+  function addProduct() {
+    const name = document.getElementById("product-name").value.trim();
+    const price = document.getElementById("product-price").value.trim();
+    const desc = document.getElementById("product-desc").value.trim();
+    const location = document.getElementById("product-location").value;
+    const imageInput = document.getElementById("product-image");
+
+    if (!name || !price || !imageInput.files[0]) {
+      alert("يرجى ملء جميع الحقول وإضافة صورة.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      const product = {
+        name,
+        price,
+        location,
+        description: desc,
+        image: reader.result
+      };
+
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+      products.push(product);
+      localStorage.setItem("products", JSON.stringify(products));
+
+      document.getElementById("product-name").value = "";
+      document.getElementById("product-price").value = "";
+      document.getElementById("product-desc").value = "";
+      document.getElementById("product-image").value = "";
+      loadProducts();
+    };
+
+    reader.readAsDataURL(imageInput.files[0]);
+  }
+
+  function loadProducts() {
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    const list = document.getElementById("product-list");
+    list.innerHTML = "";
+    products.forEach((product, index) => {
+      const item = document.createElement("div");
+      item.className = "product-item";
+      item.innerHTML = `
+        <strong>${product.name}</strong><br>
+        السعر: $${product.price}<br>
+        ${product.description ? 'الوصف: ' + product.description + '<br>' : ''}
+        <button onclick="deleteProduct(${index})">حذف</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function deleteProduct(index) {
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    products.splice(index, 1);
+    localStorage.setItem("products", JSON.stringify(products));
+    loadProducts();
+  }
+
+  function loadOrders() {
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const list = document.getElementById("order-list");
+    list.innerHTML = "";
+
+    if (orders.length === 0) {
+      list.innerHTML = "<p>لا توجد طلبات حالياً.</p>";
+      return;
+    }
+
+    orders.forEach((order, index) => {
+      const item = document.createElement("div");
+      item.className = "order-item";
+      item.innerHTML = `
+        <strong>طلب على المنتج: ${order.product}</strong><br>
+        بريد العميل: ${order.email}<br>
+        ${order.image ? `<img src="${order.image}" alt="صورة الدفع">` : ""}
+        <button onclick="acceptOrder(${index}, '${order.email}')">قبول</button>
+        <button onclick="rejectOrder(${index}, '${order.email}')">رفض</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function acceptOrder(index, email) {
+    addNotification(email, "تم إرسال الأكواد في الإيميل.");
+    removeOrder(index);
+    alert("تم قبول الطلب.");
+  }
+
+  function rejectOrder(index, email) {
+    addNotification(email, "تم رفض الطلب!");
+    removeOrder(index);
+    alert("تم رفض الطلب.");
+  }
+
+  function removeOrder(index) {
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    orders.splice(index, 1);
+    localStorage.setItem("orders", JSON.stringify(orders));
+    loadOrders();
+  }
+
+  function addNotification(email, message) {
+    const notes = JSON.parse(localStorage.getItem("notifications") || "[]");
+    notes.push({ email, message, date: new Date().toLocaleString() });
+    localStorage.setItem("notifications", JSON.stringify(notes));
+  }
+</script>
+
+</body>
+</html>

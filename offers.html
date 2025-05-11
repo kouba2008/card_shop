@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>العروض</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background-color: #fdfdfd;
+      direction: rtl;
+      padding-bottom: 80px;
+    }
+
+    .dashboard {
+      padding: 20px;
+    }
+
+    .dashboard h1 {
+      text-align: center;
+      color: #ff4081;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+    }
+
+    .product {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .product h3 {
+      margin: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .product-details {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      background: white;
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .product-details img {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-details h2 {
+      margin-top: 15px;
+      color: #333;
+    }
+
+    .product-details p {
+      margin-top: 10px;
+      color: #555;
+    }
+
+    .product-details .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .product-details button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .buy-btn {
+      background-color: #ff4081;
+      color: white;
+    }
+
+    .add-btn {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 22px;
+      color: #888;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #ccc;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    }
+
+    .nav-item {
+      text-align: center;
+      padding: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .circle-button {
+      width: 50px;
+      height: 50px;
+      background: #ff4081;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      margin-top: -25px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard">
+    <h1>عروض اليوم</h1>
+    <div id="offers-container" class="products-grid"></div>
+  </div>
+
+  <div id="product-details" class="product-details">
+    <button class="close-btn" onclick="closeDetails()"><i class="fas fa-times"></i></button>
+    <img id="detail-image" src="" alt="">
+    <h2 id="detail-name"></h2>
+    <p id="detail-price"></p>
+    <p id="detail-description"></p>
+    <div class="buttons">
+      <button class="buy-btn" onclick="goToPayment()">شراء</button>
+      <button class="add-btn" onclick="addToCart()">أضف إلى السلة</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><div>الرئيسية</div></a>
+    <a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><div>العروض</div></a>
+    <a href="search.html" class="nav-item"><div class="circle-button"><i class="fas fa-search"></i></div></a>
+    <a href="status.html" class="nav-item"><i class="fas fa-box"></i><div>الحالة</div></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><div>بروفايل</div></a>
+  </nav>
+
+  <script>
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const offerProducts = products.filter(p => p.category === "offers");
+
+    const offersContainer = document.getElementById("offers-container");
+    const productDetails = document.getElementById("product-details");
+    let selectedProduct = null;
+
+    function showDetails(index) {
+      selectedProduct = offerProducts[index];
+      document.getElementById("detail-image").src = selectedProduct.image;
+      document.getElementById("detail-name").textContent = selectedProduct.name;
+      document.getElementById("detail-price").textContent = "السعر: " + selectedProduct.price + " $";
+      document.getElementById("detail-description").textContent = selectedProduct.description;
+      productDetails.style.display = "block";
+    }
+
+    function closeDetails() {
+      productDetails.style.display = "none";
+    }
+
+    function goToPayment() {
+      localStorage.setItem("selectedProduct", JSON.stringify(selectedProduct));
+      window.location.href = "payment.html";
+    }
+
+    function addToCart() {
+      cart.push(selectedProduct);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert("تمت إضافة المنتج إلى السلة");
+    }
+
+    if (offerProducts.length === 0) {
+      offersContainer.innerHTML = "<p>لا توجد عروض حالياً.</p>";
+    } else {
+      offerProducts.forEach((product, index) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.onclick = () => showDetails(index);
+        div.innerHTML = `
+          <img src="${product.image}" alt="">
+          <h3>${product.name}</h3>
+        `;
+        offersContainer.appendChild(div);
+      });
+    }
+  </script>
+
+</body>
+</html>

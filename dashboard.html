@@ -1,0 +1,358 @@
+<!DOCTYPE html>  <html lang="ar">  
+<head>  
+  <meta charset="UTF-8">  
+  <title>الصفحة الرئيسية</title>  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">  
+  <style>  
+    body {  
+      margin: 0;  
+      font-family: 'Cairo', sans-serif;  
+      background-color: #f2f2f2;  
+      direction: rtl;  
+      padding-bottom: 80px;  
+    }  .top-bar {  
+  display: flex;  
+  justify-content: space-between;  
+  align-items: center;  
+  padding: 10px 15px;  
+  background-color: #fff;  
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);  
+  position: relative;  
+  z-index: 1000;  
+}  
+
+.category-button {  
+  background: none;  
+  border: none;  
+  font-size: 24px;  
+  cursor: pointer;  
+  color: #009688;  
+}  
+
+.category-menu {  
+  position: absolute;  
+  top: 55px;  
+  right: 15px;  
+  background: #fff;  
+  border: 1px solid #ddd;  
+  border-radius: 8px;  
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);  
+  display: none;  
+  flex-direction: column;  
+  width: 180px;  
+}  
+
+.category-item {  
+  padding: 12px;  
+  text-decoration: none;  
+  color: #333;  
+  border-bottom: 1px solid #eee;  
+  cursor: pointer;  
+}  
+
+.category-item:last-child {  
+  border-bottom: none;  
+}  
+
+.category-item:hover {  
+  background-color: #f1f1f1;  
+}  
+
+.dashboard {  
+  padding: 20px;  
+}  
+
+.dashboard h1 {  
+  text-align: center;  
+  color: #009688;  
+}  
+
+#products-container {  
+  display: grid;  
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));  
+  gap: 15px;  
+}  
+
+.product {  
+  background: #fff;  
+  border-radius: 12px;  
+  padding: 10px;  
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);  
+  cursor: pointer;  
+  text-align: center;  
+}  
+
+.product img {  
+  width: 100%;  
+  height: 140px;  
+  object-fit: cover;  
+  border-radius: 8px;  
+  margin-bottom: 8px;  
+}  
+
+.product h3 {  
+  margin: 0;  
+  color: #333;  
+  font-size: 16px;  
+}  
+
+.bottom-nav {  
+  position: fixed;  
+  bottom: 0;  
+  width: 100%;  
+  background: #fff;  
+  display: flex;  
+  justify-content: space-around;  
+  border-top: 1px solid #ccc;  
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);  
+}  
+
+.nav-item {  
+  text-align: center;  
+  padding: 10px;  
+  color: #666;  
+  font-size: 14px;  
+}  
+
+.circle-button {  
+  width: 50px;  
+  height: 50px;  
+  background: #009688;  
+  border-radius: 50%;  
+  display: flex;  
+  justify-content: center;  
+  align-items: center;  
+  color: white;  
+  margin-top: -25px;  
+  font-size: 18px;  
+}  
+
+.cart-button {  
+  background-color: #009688;  
+  color: white;  
+  border: none;  
+  padding: 10px 15px;  
+  border-radius: 50%;  
+  font-size: 18px;  
+  cursor: pointer;  
+  position: relative;  
+}  
+
+.cart-count {  
+  position: absolute;  
+  top: -5px;  
+  left: -5px;  
+  background: red;  
+  color: white;  
+  border-radius: 50%;  
+  font-size: 12px;  
+  padding: 2px 6px;  
+}  
+
+.product-modal {  
+  position: fixed;  
+  top: 0;  
+  right: 0;  
+  left: 0;  
+  bottom: 0;  
+  background: rgba(0,0,0,0.5);  
+  display: none;  
+  justify-content: center;  
+  align-items: center;  
+  z-index: 2000;  
+  opacity: 0;  
+  transform: scale(0.95);  
+  transition: opacity 0.3s ease, transform 0.3s ease;  
+}  
+
+.product-modal.show {  
+  opacity: 1;  
+  transform: scale(1);  
+}  
+
+.product-modal-content {  
+  background: white;  
+  padding: 20px;  
+  border-radius: 12px;  
+  width: 90%;  
+  max-width: 400px;  
+  text-align: center;  
+  position: relative;  
+}  
+
+.product-modal-content img {  
+  max-width: 100%;  
+  height: 200px;  
+  object-fit: contain;  
+  border-radius: 8px;  
+}  
+
+.product-modal-content h2 {  
+  margin: 15px 0 10px;  
+}  
+
+.product-modal-content p {  
+  margin: 5px 0;  
+}  
+
+.actions {  
+  display: flex;  
+  justify-content: center;  
+  gap: 10px;  
+  margin-top: 15px;  
+}  
+
+.actions button {  
+  flex: 1;  
+  padding: 10px;  
+  background-color: #009688;  
+  color: white;  
+  border: none;  
+  border-radius: 8px;  
+  cursor: pointer;  
+}  
+
+.close-btn {  
+  position: absolute;  
+  top: 10px;  
+  left: 10px;  
+  font-size: 20px;  
+  cursor: pointer;  
+  color: #555;  
+}
+
+  </style>  
+</head>  
+<body>    <div class="top-bar">  
+    <div class="category-wrapper">  
+      <button onclick="toggleCategories()" class="category-button">  
+        <i class="fas fa-bars"></i>  
+      </button>  
+      <div id="category-menu" class="category-menu">  
+        <div class="category-item" onclick="filterByCategory('Steam')">Steam</div>  
+        <div class="category-item" onclick="filterByCategory('Google Play')">Google Play</div>  
+        <div class="category-item" onclick="filterByCategory('Games')">Games</div>  
+        <div class="category-item" onclick="filterByCategory('Windows')">Windows</div>  
+        <div class="category-item" onclick="filterByCategory('Netflix')">Netflix</div>  
+        <div class="category-item" onclick="filterByCategory('all')">عرض الكل</div>  
+      </div>  
+    </div>  <!-- إشعارات + سلة -->  
+<div style="display: flex; gap: 10px; align-items: center;">  
+  <button class="cart-button" onclick="goToNotifications()" title="الإشعارات">  
+    <i class="fas fa-bell"></i>  
+  </button>  
+  <button class="cart-button" onclick="goToCart()" title="السلة">  
+    <i class="fas fa-shopping-cart"></i>  
+    <span class="cart-count" id="cart-count">0</span>  
+  </button>  
+</div>
+
+  </div>    <div class="dashboard">  
+    <h1>مرحبا بك في المتجر</h1>  
+    <div id="products-container"></div>  
+  </div>    <nav class="bottom-nav">  
+    <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><div>الرئيسية</div></a>  
+    <a href="offers.html" class="nav-item"><i class="fas fa-tags"></i><div>العروض</div></a>  
+    <a href="search.html" class="nav-item"><div class="circle-button"><i class="fas fa-search"></i></div></a>  
+    <a href="status.html" class="nav-item"><i class="fas fa-box"></i><div>الحالة</div></a>  
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><div>بروفايل</div></a>  
+  </nav>    <div class="product-modal" id="product-modal" onclick="closeModal()">  
+    <div class="product-modal-content" onclick="event.stopPropagation()">  
+      <span class="close-btn" onclick="closeModal()">&times;</span>  
+      <div id="modal-content"></div>  
+    </div>  
+  </div>    <script>  
+    const products = JSON.parse(localStorage.getItem("products")) || [];  
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];  
+    const container = document.getElementById("products-container");  
+    const modal = document.getElementById("product-modal");  
+    const modalContent = document.getElementById("modal-content");  
+  
+    let filteredProducts = [...products];  
+  
+    function updateCartCount() {  
+      document.getElementById("cart-count").textContent = cart.length;  
+    }  
+  
+    function goToCart() {  
+      window.location.href = "cart.html";  
+    }  
+  
+    function goToNotifications() {  
+      window.location.href = "notifications.html";  
+    }  
+  
+    function goToPayment(index) {  
+      const selected = filteredProducts[index];  
+      localStorage.setItem("selectedProduct", JSON.stringify(selected));  
+      window.location.href = "payment.html";  
+    }  
+  
+    function addToCart(index) {  
+      const product = filteredProducts[index];  
+      cart.push(product);  
+      localStorage.setItem("cart", JSON.stringify(cart));  
+      updateCartCount();  
+    }  
+  
+    function renderProducts() {  
+      container.innerHTML = "";  
+      if (filteredProducts.length === 0) {  
+        container.innerHTML = "<p>لا توجد منتجات حالياً.</p>";  
+        return;  
+      }  
+      filteredProducts.forEach((product, index) => {  
+        const div = document.createElement("div");  
+        div.className = "product";  
+        div.onclick = () => showProductDetails(index);  
+        div.innerHTML = `  
+          ${product.image ? `<img src="${product.image}" alt="صورة المنتج">` : ""}  
+          <h3>${product.name}</h3>  
+        `;  
+        container.appendChild(div);  
+      });  
+    }  
+  
+    function toggleCategories() {  
+      const menu = document.getElementById("category-menu");  
+      menu.style.display = menu.style.display === "flex" ? "none" : "flex";  
+    }  
+  
+    function filterByCategory(category) {  
+      filteredProducts = (category === 'all')   
+        ? [...products]   
+        : products.filter(p => p.category === category);  
+      toggleCategories();  
+      renderProducts();  
+    }  
+  
+    function showProductDetails(index) {  
+      const product = filteredProducts[index];  
+      modalContent.innerHTML = `  
+        ${product.image ? `<img src="${product.image}" alt="صورة المنتج">` : ""}  
+        <h2>${product.name}</h2>  
+        <p><strong>السعر:</strong> ${product.price} $</p>  
+        <p>${product.description}</p>  
+        <div class="actions">  
+          <button onclick="goToPayment(${index})">شراء</button>  
+          <button onclick="addToCart(${index})">أضف إلى السلة</button>  
+        </div>  
+      `;  
+      modal.style.display = "flex";  
+      requestAnimationFrame(() => {  
+        modal.classList.add("show");  
+      });  
+    }  
+  
+    function closeModal() {  
+      modal.classList.remove("show");  
+      setTimeout(() => {  
+        modal.style.display = "none";  
+      }, 300);  
+    }  
+  
+    updateCartCount();  
+    renderProducts();  
+  </script>  </body>  
+</html>   
+ضف هنا 
